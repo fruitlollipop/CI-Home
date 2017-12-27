@@ -1,0 +1,8 @@
+Django > 1.10.5, < 2.0
+robotframework
+robotframework-selenium2library
+Selenium >= 3.0.0
+pytest
+nose
+nose-parameterized
+proboscis
