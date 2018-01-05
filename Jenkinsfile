@@ -4,7 +4,8 @@ pipeline {
     stage('Build') {
       steps {
         sh 'echo "Start to Build"'
-        sh '/mnt/hgfs/Share/Projects/CI-Home && docker build -t hellodjango:testenv .'
+        sh 'pwd'
+        sh 'cd /mnt/hgfs/Share/Projects/CI-Home && docker build -t hellodjango:testenv .'
       }
     }
     stage('Test') {
