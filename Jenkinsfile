@@ -5,6 +5,7 @@ pipeline {
       steps {
         sh 'echo "Start to Build"'
         sh 'pwd'
+        sh 'whoami'
         sh 'cd /mnt/hgfs/Share/Projects/CI-Home && docker build -t hellodjango:testenv .'
       }
     }
