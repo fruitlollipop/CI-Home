@@ -1,0 +1,17 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name 127.0.0.1;
+    charset UTF-8;
+    access_log /var/log/nginx/lollipop_access.log;
+    error_log /var/log/nginx/lollipop_error.log;
+
+    root /app/CI-Home/;
+    index index.html;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass 127.0.0.1:8081;
+        uwsgi_read_timeout 2;
+    }
+}
