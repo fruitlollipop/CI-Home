@@ -4,7 +4,7 @@ pipeline {
     stage('Build') {
       steps {
         sh 'echo "Start to Build"'
-        sh 'docker build -t hellodjango:testenv .'
+        sh 'docker build -t hellodjango:v2 .'
       }
     }
     stage('Test') {
