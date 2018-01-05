@@ -4,15 +4,13 @@ pipeline {
     stage('Build') {
       steps {
         sh 'echo "Start to Build"'
-        sh 'pwd'
-        sh 'whoami'
-        sh 'cd /mnt/hgfs/Share/Projects/CI-Home && docker build -t hellodjango:testenv .'
+        sh 'docker build -t hellodjango:testenv .'
       }
     }
     stage('Test') {
       agent
       {
-        docker { image 'hellodjango:testenv' }
+        docker { image 'hellodjango:v2' }
       }
       steps {
         sh 'echo "Start to Test"'

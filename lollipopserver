@@ -6,7 +6,7 @@ server {
     access_log /var/log/nginx/lollipop_access.log;
     error_log /var/log/nginx/lollipop_error.log;
 
-    root /app/CI-Home/;
+    root /app/;
     index index.html;
 
     location / {
