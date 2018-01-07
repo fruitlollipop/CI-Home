@@ -7,6 +7,6 @@ Library     SeleniumLibrary
 *** Test Cases ***
 Test title
     [Tags]    Test
-    Open Browser    http://192.168.0.119:8083   Firefox
+    Open Browser    http://192.168.0.119:8083   ${browser}
     Page Should Contain     Congratulations on your first Django-powered page
     [teardown]      Close Browser
