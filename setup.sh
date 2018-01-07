@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-uwsgi --ini /app/Lollipop/uwsgi.ini > /dev/null 2>&1 &
+# uwsgi --ini /app/Lollipop/uwsgi.ini > /dev/null 2>&1 &
 
 if [ ! -f "/etc/nginx/sites-available/lollipopserver" ]
 then
@@ -12,5 +12,6 @@ then
 fi
 
 /etc/init.d/nginx restart
+uwsgi --ini /app/Lollipop/uwsgi.ini
 
 exit 0
