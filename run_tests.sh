@@ -9,5 +9,8 @@ then
 fi
 chmod +x $firefox_driver
 export PATH=$PATH:$current_dir
+pwd
+ls -l
+echo $PATH
 robot -o /var/lib/jenkins/logs ${current_dir}/st_login_start_page.robot
 exit 0
