@@ -17,7 +17,6 @@ pipeline {
     stage('Deploy') {
       steps {
         sh 'echo "Start to Deploy"'
-        sh 'docker stop lollipop'
       }
     }
   }
