@@ -7,7 +7,7 @@ then
   wget https://github.com/mozilla/geckodriver/releases/download/v${firefox_driver_version}/$firefox_driver
   tar zxf $firefox_driver
 fi
-chmod +x $firefox_driver
+chmod 777 $firefox_driver
 export PATH=$PATH:$current_dir
 pwd
 ls -l
