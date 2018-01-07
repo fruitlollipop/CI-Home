@@ -14,8 +14,8 @@ RUN apt-get update -y \
     && pip install -r requirements.txt \
     && apt-get purge -y
 
-# Make port 80 available to the world outside this container
+# Make port 80, 8082 available to the world outside this container
 EXPOSE 80
+EXPOSE 8082
 
-# CMD ["uwsgi", "--ini", "/app/Lollipop/uwsgi.ini"]
 CMD ["bash", "/app/setup.sh"]
