@@ -11,7 +11,10 @@ pipeline {
       steps {
         sh 'echo "Start to Test"'
         sh 'docker run -d -p 8083:8082 --name lollipop hellodjango:v6'
-        sh 'docker exec -i lollipop bash /app/run_tests.sh'
+        sh 'wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz'
+        sh 'tar zxf geckodriver-v0.19.1-linux64.tar.gz && chmod +x geckodriver-v0.19.1-linux64.tar.gz'
+        sh 'export PATH=$PATH:.'
+        sh './run_tests.sh'
       }
     }
     stage('Deploy') {
