@@ -10,7 +10,7 @@ pipeline {
     stage('Test') {
       steps {
         sh 'echo "Start to Test"'
-        sh 'docker run -d -p 8083:80 --name lollipop hellodjango:v5'
+        sh 'docker run -d -p 8083:8082 --name lollipop hellodjango:v5'
         sh 'docker exec -i lollipop bash /app/run_tests.sh'
       }
     }
