@@ -4,19 +4,19 @@ set -e
 app_name=
 work_dir="/app"
 docker_file="Dockerfile"
+build_context="/tmp/build"
 build_tag=
 port="8000"
 
 prepare_to_build(){
-    local build_dir="/tmp/build"
-    if [ -d "$build_dir" ]; then
-        rm -f $build_dir/*
+    if [ -d "$build_context" ]; then
+        rm -f $build_context/*
     else
-        mkdir -p $build_dir
+        mkdir -p $build_context
     fi
-    cp $3 uwsgi.ini nginx pip.conf requirements.txt deploy_app.sh $build_dir
-    sed -Ei -e 's#\$WORK_DIR#'$1'#g' -e 's#\$APP_NAME#'$2'#g' $build_dir/uwsgi.ini
-    sed -Ei -e 's#\$APP_NAME#'$2'#g' $build_dir/$3
+    cp $3 uwsgi.ini nginx pip.conf requirements.txt deploy_app.sh $build_context
+    sed -Ei -e 's#\$WORK_DIR#'$1'#g' -e 's#\$APP_NAME#'$2'#g' $build_context/uwsgi.ini
+    sed -Ei -e 's#\$APP_NAME#'$2'#g' $build_context/$3
 }
 
 get_help() {
@@ -73,7 +73,7 @@ if [ -z "$build_tag" ]; then
     exit 1
 fi
 prepare_to_build $work_dir $app_name $docker_file
-docker build -f /tmp/build/$docker_file --force-rm --build-arg WORK_DIR=$work_dir -t $build_tag /tmp/build
+docker build -f $build_context/$docker_file --force-rm --build-arg WORK_DIR=$work_dir -t $build_tag $build_context
 if [ "$?" = 0 ]; then
     current_dir=$(pwd)
     docker_id=$(docker run -p $port:8080 -v $current_dir/$app_name:$work_dir/$app_name -d $build_tag)
