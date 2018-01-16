@@ -16,6 +16,7 @@ COPY nginx $WORK_DIR
 COPY uwsgi.ini $WORK_DIR
 
 RUN apt-get update -y \
+    && chmod 755 /usr/local/bin/deploy_app.sh \
     && apt-get install $INSTALL_TOOLS -y \
     && mkdir -p ~/.pip \
     && mv $WORK_DIR/pip.conf ~/.pip \
