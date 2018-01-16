@@ -15,7 +15,8 @@ COPY requirements.txt $WORK_DIR
 COPY nginx $WORK_DIR
 COPY uwsgi.ini $WORK_DIR
 
-RUN apt-get update -y \
+RUN sed -Ei 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && apt-get update -y \
     && chmod 755 /usr/local/bin/deploy_app.sh \
     && apt-get install $INSTALL_TOOLS -y \
     && mkdir -p ~/.pip \
