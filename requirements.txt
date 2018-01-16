@@ -1,7 +1,7 @@
 Django > 1.10.5, < 2.0
 robotframework
-robotframework-selenium2library
-Selenium >= 3.0.0
+robotframework-seleniumlibrary
+Selenium
 pytest
 nose
 nose-parameterized
