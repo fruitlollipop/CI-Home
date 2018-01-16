@@ -16,11 +16,11 @@ COPY nginx $WORK_DIR
 COPY uwsgi.ini $WORK_DIR
 
 RUN apt-get update -y \
+    && apt-get install $INSTALL_TOOLS -y \
     && mkdir -p ~/.pip \
     && mv $WORK_DIR/pip.conf ~/.pip \
-    && apt-get install $INSTALL_TOOLS -y \
-    && pip install --upgrade pip setuptools wheel \
-    && pip install -r requirements.txt \
+    && pip3 install --upgrade pip setuptools wheel \
+    && pip3 install -r requirements.txt \
     && apt-get purge -y
 
 # Make port APP_PORT available to the world outside this container
