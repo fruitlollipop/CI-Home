@@ -2,7 +2,7 @@ FROM ubuntu:latest
 MAINTAINER tzhou "zhoutangxing@126.com"
 
 ENV BASE_TOOLS wget curl vim nginx
-ENV PYTHON python3 python3-dev build-essential python3-pip
+ENV PYTHON python3 python3-dev libmysqlclient-dev build-essential python3-pip
 ARG INSTALL_TOOLS
 ENV INSTALL_TOOLS $BASE_TOOLS $PYTHON $INSTALL_TOOLS
 ARG WORK_DIR=/app 
