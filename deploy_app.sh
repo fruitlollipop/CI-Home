@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APP_NAME=
+app_name=
 NGINX_AVAILABLE_DIR="/etc/nginx/sites-available"
 NGINX_ENABLED_DIR="/etc/nginx/sites-enabled"
 
@@ -16,6 +16,13 @@ nginx_reset() {
     /etc/init.d/nginx start
 }
 
+uwsgi_reset() {
+    local work_dir=$(pwd)
+    sed -Ei -e 's#\$WORK_DIR#'$work_dir'#g' -e 's#\$APP_NAME#'$1'#g' uwsgi.ini
+    cp uwsgi.ini $1/uwsgi.ini
+    uwsgi --ini $1/uwsgi.ini 
+}
+
 get_help() {
     echo "Usage: $0 [-n <app name>]"
 }
@@ -24,31 +31,34 @@ if [ "${1:0:1}" = '-' ]; then
     while getopts :n:h opt; do
         case "$opt" in
     	n)
-    	    APP_NAME=${OPTARG}
-            echo "The app $APP_NAME is to be deployed."
+    	    app_name=${OPTARG}
     	    ;;
     	h)
     	    get_help
     	    exit 0
     	    ;;
     	:)
-    	    echo "The option -$OPTARG requires an argument."
-    	    exit 1
+    	    echo "ERROR: The option -$OPTARG requires an argument."
             ;;
     	?)
-    	    echo "The option -$OPTARG is invalid."
+    	    echo "ERROR: The option -$OPTARG is invalid."
     	    get_help
-            exit 1
+            exit 2
     	    ;;
         esac
     done
-    if [ -d "$APP_NAME" ]; then
-        nginx_reset $APP_NAME
-	cp uwsgi.ini $APP_NAME/uwsgi.ini
-        uwsgi --ini $APP_NAME/uwsgi.ini 
+    if [ -z "$app_name" ]; then
+        echo "ERROR: There is no app specified to run."
+	exit 2
     else
-        echo "The directory $APP_NAME does not exist."
-	exit 1
+        if [ -d "$app_name" ]; then
+            echo "INFO: The app $app_name is to be deployed."
+            nginx_reset $app_name
+            uwsgi_reset $app_name
+        else
+            echo "ERROR: The directory $app_name is not found."
+            exit 1
+        fi
     fi
 else
     exec "$@"

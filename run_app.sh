@@ -4,19 +4,24 @@ set -e
 app_name=
 work_dir="/app"
 docker_file="Dockerfile"
-build_context="/tmp/build"
 build_tag=
 port="8000"
 
 prepare_to_build(){
-    if [ -d "$build_context" ]; then
-        rm -f $build_context/*
-    else
-        mkdir -p $build_context
+    if [ ! -f "$1" ]; then
+        echo "ERROR: The dockerfile $1 is not found."
+        exit 1
     fi
-    cp $3 uwsgi.ini nginx pip.conf requirements.txt deploy_app.sh $build_context
-    sed -Ei -e 's#\$WORK_DIR#'$1'#g' -e 's#\$APP_NAME#'$2'#g' $build_context/uwsgi.ini
-    sed -Ei -e 's#\$APP_NAME#'$2'#g' $build_context/$3
+    if [ -z "$2" ]; then
+        echo "ERROR: The tag for the build is not specified."
+        exit 2
+    fi
+    for i in uwsgi.ini nginx pip.conf requirements.txt deploy_app.sh; do
+        if [ ! -f "$i" ]; then
+            echo "ERROR: $i is not found."
+	    exit 1
+	fi
+    done
 }
 
 get_help() {
@@ -27,19 +32,15 @@ while getopts :d:f:t:p:h opt; do
     case "$opt" in
 	d)
 	    work_dir=${OPTARG%/}
-	    echo "INFO: The work directory for the app is $work_dir."
 	    ;;
 	f)
 	    docker_file=${OPTARG}
-	    echo "INFO: The dockerfile for the build is $docker_file."
 	    ;;
 	t)
 	    build_tag=${OPTARG}
-	    echo "INFO: The tag for the build is $build_tag."
 	    ;;
 	p)
 	    port=${OPTARG}
-	    echo "INFO: The port for the app is $port."
 	    ;;
 	h)
 	    get_help
@@ -47,49 +48,57 @@ while getopts :d:f:t:p:h opt; do
 	    ;;
 	:)
 	    echo "WARNING: The option -$OPTARG requires an argument."
-	    exit 1
             ;;
 	?)
 	    echo "ERROR: The option -$OPTARG is invalid."
 	    get_help
-            exit 1
+            exit 2
 	    ;;
     esac
 done
 shift $(($OPTIND -1 ))
 if [ "$#" = 0 ]; then
-    echo "WARNING: There is no app specified to deployed. Exit!"
-    get_help
-    exit 0
+    app_name=""
 else
     app_name=$1
 fi
-if [ ! -f "$docker_file" ]; then
-    echo "ERROR: The dockerfile $docker_file is not found!"
-    exit 1
-fi
-if [ -z "$build_tag" ]; then
-    echo "ERROR: The tag for the build is not specified!"
-    exit 1
-fi
-prepare_to_build $work_dir $app_name $docker_file
-docker build -f $build_context/$docker_file --force-rm --build-arg WORK_DIR=$work_dir -t $build_tag $build_context
-if [ "$?" = 0 ]; then
-    current_dir=$(pwd)
-    docker_id=$(docker run -p $port:8080 -v $current_dir/$app_name:$work_dir/$app_name -d $build_tag)
-    docker_info=$(docker ps -a -f ID=$docker_id --format "{{.ID}}:{{.Names}}:{{.Status}}")
-    if [ -z "$docker_info" ]; then
-	echo "ERROR: The app is not run."
-        docker_id=""
-	exit 1
+prepare_to_build $docker_file $build_tag
+image_info=$(docker images $build_tag --format "{{.Repository}}:{{.Tag}}")
+if [ -z "$image_info" ]; then
+    echo "INFO: \"$build_tag\" has not been built. Start to build it. The work directory is $work_dir"
+    docker build -f $docker_file --force-rm --build-arg WORK_DIR=$work_dir -t $build_tag .
+    if [ "$?" = 0 ]; then
+        echo "INFO: \"$build_tag\" is successfully built."
     else
-	docker_id=$(echo $docker_info | awk -F ':' '{print $1}')
-	docker_name=$(echo $docker_info | awk -F ':' '{print $2}')
-	docker_status=$(echo $docker_info | awk -F ':' '{print $3}')
-	echo "INFO: The container \"$docker_name\" is $docker_status."
-	exit 0
+        echo "ERROR: \"$build_tag\" is not successfully built."
+        exit 1
     fi
 else
-    echo "ERROR: $app is not successfully built."
-    exit 1
+    work_dir=$(docker run -i $build_tag pwd)
+    docker container prune -f
+    echo "INFO: \"$build_tag\" has been built. The work directory is $work_dir"
+fi
+if [ -z "$app_name" ]; then
+    echo "WARNING: There is no app specified to run."
+    exit 0
+else
+    current_dir=$(pwd)
+    if [ -d "$current_dir/$app_name" ]; then
+        docker_id=$(docker run -p $port:8080 -v $current_dir/$app_name:$work_dir/$app_name -d $build_tag -n $app_name)
+        docker_info=$(docker ps -a -f ID=$docker_id --format "{{.ID}}:{{.Names}}:{{.Status}}")
+        if [ -z "$docker_info" ]; then
+            echo "ERROR: The app \"$app_name\" is not run."
+            docker_id=""
+            exit 1
+        else
+            docker_id=$(echo $docker_info | awk -F ':' '{print $1}')
+            docker_name=$(echo $docker_info | awk -F ':' '{print $2}')
+            docker_status=$(echo $docker_info | awk -F ':' '{print $3}')
+            echo "INFO: \"$app_name\" is $docker_status on the container \"$docker_name\". The port for the app is $port."
+            exit 0
+        fi
+    else
+        echo "ERROR: The home directory for \"$app_name\" is not found."
+        exit 1
+    fi
 fi

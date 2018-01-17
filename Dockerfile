@@ -29,4 +29,4 @@ RUN sed -Ei 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list \
 EXPOSE $APP_PORT
 
 ENTRYPOINT ["deploy_app.sh"]
-CMD ["-n", "$APP_NAME"]
+CMD ["-n"]
