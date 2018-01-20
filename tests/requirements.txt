@@ -3,6 +3,8 @@ selenium
 robotframework
 robotframework-seleniumlibrary
 pytest
+pytest-pep8
+pytest-html
 nose
 nose-parameterized
 proboscis

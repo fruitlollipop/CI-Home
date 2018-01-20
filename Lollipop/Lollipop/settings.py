@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Strawberry',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +81,7 @@ DATABASES = {
         'PORT': '8084',
         'USER': 'root',
         'PASSWORD': 'zhou19891001',
-        'NAME': '',
+        'NAME': 'Fruits',
     }
 }
 
